@@ -1,0 +1,17 @@
+{
+	"version": 2,
+	"builds": [
+	  {
+		"src": "src/**/*.ts",
+		"use": "@now/node"
+	  }
+	],
+	"routes": [
+	  { "src": "/(.*)", "dest": "src/$1" },
+	  { "handle": "filesystem" }
+	],
+	"env": {
+	  "NODE_ENV": "production"
+	}
+  }
+  
