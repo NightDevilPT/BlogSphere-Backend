@@ -159,10 +159,10 @@ export class UserService {
       user.verified = true;
       user.token = null; // Optional: Clear the verification token
       user.password = await this.passwordService.hashPassword(password),
+      user.updatedAt = `${new Date().getTime()}`;
       await this.userRepository.save(user);
-      const jwt = this.jwtService.sign({ id: user.id })
 
-      return { id: user.id, jwt, message: 'Password successfully updated' };
+      return { message: 'Password successfully updated' };
     } catch (err) {
       if (err instanceof BadRequestException || err instanceof NotFoundException) {
         throw new GoneException(err.message);
