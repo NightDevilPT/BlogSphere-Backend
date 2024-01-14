@@ -22,6 +22,12 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 255, nullable: true, default: null })
   token: string;
 
+  @Column({ default: new Date().getTime() })
+  createdAt: string;
+
+  @Column({ default: new Date().getTime() })
+  updatedAt: string;
+
   @OneToOne(() => ProfileEntity, profile => profile.user, { cascade: true })
   @JoinColumn()
   profile: ProfileEntity;

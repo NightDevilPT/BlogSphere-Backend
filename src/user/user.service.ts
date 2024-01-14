@@ -69,7 +69,7 @@ export class UserService {
   async verifyEmail(token: string): Promise<userReturnType> {
     try {
       if (!token) {
-        throw new BadRequestException('Token is required for email verification');
+        throw new NotFoundException('Invalid Token');
       }
 
       const user = await this.userRepository.findOne({ where: { token } });
@@ -81,15 +81,14 @@ export class UserService {
       user.verified = true;
       user.token = null; // Optional: Clear the verification token
       await this.userRepository.save(user);
-      const jwt = this.jwtService.sign({ id: user.id })
 
-      return { id: user.id, jwt, message: 'Email verification successful' };
+      return { message: 'Email verification successful' };
     } catch (err) {
-      if (err instanceof jwt.TokenExpiredError) {
-        throw new GoneException('Token has expired');
-      } else {
-        throw new GoneException('Invalid token');
+      if (err instanceof NotFoundException) {
+        throw new NotFoundException(err.message);
       }
+        throw new InternalServerErrorException('Internal Server Error');
+      
     }
   }
 
