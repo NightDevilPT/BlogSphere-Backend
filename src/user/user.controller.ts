@@ -1,19 +1,48 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Query,
+  Put
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserCreateDTO } from './dto/user-create.dto';
-import { EmailService } from 'src/service/email-service.service';
+import { EmailValidationPipe } from 'src/pipe/email-validation/email-validation.pipe';
+import { UserUpdateDTO } from './dto/user-update.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService,private readonly emailService: EmailService) {}
+  constructor(
+    private readonly userService: UserService
+  ) {}
 
   @Post('/create')
-  create(@Body() createUserDto: UserCreateDTO):any {
-    return this.userService.create(createUserDto);  
+  create(@Body() createUserDto: UserCreateDTO): any {
+    return this.userService.create(createUserDto);
   }
 
   @Put('/verify')
-  verify(@Query('token') token:string ):any {
+  verify(@Query('token') token: string): any {
     return this.userService.verifyEmail(token);
+  }
+
+  @Put('/forget-password')
+  sendUpdatePasswordLink(@Query('email',new EmailValidationPipe()) email: string): any {
+    return this.userService.sendUpdatePasswordLink(email);
+  }
+
+  @Put('/update-password')
+  updatePassword(@Body() updateUserDto:UserUpdateDTO,@Query('token') token:string): any {
+    return this.userService.updatePassword(updateUserDto.password,token);
+  }
+
+  @Post('/login')
+  login(@Body('email',new EmailValidationPipe()) email:string,@Body('password') password:string):any{
+    return this.userService.login(email,password);
+  }
+
+  @Put('/update')
+  update(@Body() updateUserDto:UserUpdateDTO):any{
+    return
   }
 }
