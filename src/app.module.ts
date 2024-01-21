@@ -15,6 +15,8 @@ import { EmailService } from './service/email-service.service';
 import { ProfileEntity } from './profile/entities/profile.entity';
 import { CommentEntity } from './comment/entities/comment.entity';
 import { PasswordService } from './service/password-service.service';
+import { GlobalInterceptor } from './interceptors/guard.interceptor';
+import { JwtService } from './service/jwt.service';
 
 
 @Module({
@@ -35,6 +37,6 @@ import { PasswordService } from './service/password-service.service';
     CommentModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService,PasswordService],
+  providers: [AppService, EmailService,PasswordService,GlobalInterceptor,JwtService],
 })
 export class AppModule {}
