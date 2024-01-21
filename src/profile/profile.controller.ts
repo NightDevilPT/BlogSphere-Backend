@@ -1,13 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Req, BadRequestException, ValidationPipe, UsePipes, Put } from '@nestjs/common';
 import { ProfileService } from './profile.service';
+import { GlobalInterceptor } from 'src/interceptors/guard.interceptor';
+import { ProfileCreateDTO } from './dto/profile-create.dto';
+import { Request } from 'express';
 
 @Controller('profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
-  @Post()
-  create(@Body() createProfileDto: any) {
-    return this.profileService.create(createProfileDto);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.profileService.getProfileByIdWithUser(id);
   }
 
   @Get()
@@ -15,18 +18,16 @@ export class ProfileController {
     return this.profileService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.profileService.findOne(+id);
+  @Post('create')
+  @UseInterceptors(GlobalInterceptor)
+  create(@Body() createProfileDto: ProfileCreateDTO,@Req() req: Request) {
+    return this.profileService.create(createProfileDto,req.body?.user?.id);
   }
 
-  @Patch(':id')
+
+  @Put(':id')
+  @UseInterceptors(GlobalInterceptor)
   update(@Param('id') id: string, @Body() updateProfileDto: any) {
-    return this.profileService.update(+id, updateProfileDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.profileService.remove(+id);
+    return this.profileService.update(id, updateProfileDto);
   }
 }

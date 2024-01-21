@@ -31,4 +31,5 @@ export class ProfileEntity {
 
   @OneToMany(() => CommentEntity, comment => comment.profile, { cascade: true })
   comments: CommentEntity[];
+  profileData: { id: string; username: string; email: string; createdAt: string; updatedAt: string; verified: boolean; };
 }

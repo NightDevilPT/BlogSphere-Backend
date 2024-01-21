@@ -1,24 +1,83 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { ProfileCreateDTO } from './dto/profile-create.dto';
+import { ProfileEntity } from './entities/profile.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ProfileService {
-  create(createProfileDto: any) {
-    return 'This action adds a new profile';
+  constructor(
+    @InjectRepository(ProfileEntity)
+    private readonly profileRepository: Repository<ProfileEntity>,
+  ) { }
+
+  async create(
+    createProfileDto: ProfileCreateDTO,
+    id: string,
+  ): Promise<ProfileCreateDTO> {
+    try {
+      const newProfileData = {
+        ...createProfileDto,
+        user: { id },
+      };
+      const newProfile = await this.profileRepository.create(newProfileData);
+      const createdProfile = await this.profileRepository.save(newProfile);
+      return createdProfile;
+    } catch (err) {
+      console.log('========', err.message, err.code, '??????');
+      throw new BadRequestException(err.message);
+    }
   }
 
-  findAll() {
-    return `This action returns all profile`;
+  async findAll() {
+    try{
+      const allUsers = await this.profileRepository.find()
+      return allUsers
+    }catch(error){
+      throw new BadRequestException(error.message)
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
+  async getProfileByIdWithUser(
+    profileId: string,
+  ): Promise<ProfileEntity | any> {
+    try {
+      const profileData = await this.profileRepository.findOne({where: {id: profileId}});
+      if(profileData.user){
+        profileData.user = {
+          id: profileData.user.id,
+          username: profileData.user.username,
+          email: profileData.user.email,
+          createdAt: profileData.user.createdAt,
+          updatedAt: profileData.user.updatedAt,
+          verified: profileData.user.verified,
+        } as UserEntity;
+      }
+      return profileData
+    } catch (error) {
+      if (error.name === 'EntityNotFound') {
+        throw new NotFoundException('Profile not found');
+      }
+      throw error;
+    }
   }
 
-  update(id: number, updateProfileDto: any) {
-    return `This action updates a #${id} profile`;
-  }
+  async update(id: string, updateProfileDto: any) {
+    try{
+      console.log(id)
+      const findAndUpdate = await this.profileRepository.update(id,updateProfileDto)
+      if(findAndUpdate){
+        return {message:'profile successfully updated',success:true,error:false}
+      }
 
-  remove(id: number) {
-    return `This action removes a #${id} profile`;
+      throw new NotFoundException('profile not found')
+    }catch(error){
+      throw new BadRequestException(error.message)
+    }
   }
 }
