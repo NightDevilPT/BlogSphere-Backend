@@ -7,13 +7,16 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column({ type: 'varchar', length: 255 })
   username: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  image: string;
 
   @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable:true })
   password: string;
 
   @Column({ type: 'varchar', length: 255, default: 'local' })

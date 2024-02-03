@@ -2,7 +2,7 @@ import { AppService } from './app.service';
 import { AppController } from './app.controller';
 
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { BlogModule } from './blog/blog.module';
@@ -16,7 +16,8 @@ import { ProfileEntity } from './profile/entities/profile.entity';
 import { CommentEntity } from './comment/entities/comment.entity';
 import { PasswordService } from './service/password-service.service';
 import { GlobalInterceptor } from './interceptors/guard.interceptor';
-import { JwtService } from './service/jwt.service';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtAuthService } from './service/jwt.service';
 
 
 @Module({
@@ -35,8 +36,12 @@ import { JwtService } from './service/jwt.service';
     ProfileModule,
     BlogModule,
     CommentModule,
+    JwtModule.register({
+      secret:process.env.JWT_SECRET,
+      signOptions:{expiresIn:process.env.JWT_EXPIREIN}
+    })
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService,PasswordService,GlobalInterceptor,JwtService],
+  providers: [AppService, EmailService,PasswordService,GlobalInterceptor,JwtAuthService],
 })
 export class AppModule {}

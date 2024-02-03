@@ -1,17 +1,23 @@
 // jwt.service.ts
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
-export class JwtService {
-	constructor(private readonly configService:ConfigService){}
+export class JwtAuthService {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  sign(payload: any): string {
-    return jwt.sign(payload, this.configService.get("JWT_SECRET"), { expiresIn: this.configService.get("JWT_EXPIREIN") });
+  sign(payload: any): Promise<string> {
+    const token = this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+    });
+    return token;
   }
 
-  verify(token: string): any {
-    return jwt.verify(token, this.configService.get("JWT_SECRET"));
+  verify(token: string): Promise<{ id: string }> {
+    return this.jwtService.verifyAsync(token);
   }
 }
