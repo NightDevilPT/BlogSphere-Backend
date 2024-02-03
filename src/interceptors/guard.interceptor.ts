@@ -1,11 +1,11 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { JwtService } from 'src/service/jwt.service';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { JwtAuthService } from 'src/service/jwt.service';
 
 @Injectable()
 export class GlobalInterceptor implements NestInterceptor {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(private readonly jwtService: JwtAuthService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();

@@ -13,6 +13,7 @@ export class JwtAuthService {
   sign(payload: any): Promise<string> {
     const token = this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn:this.configService.get<string>("JWT_EXPIREIN")
     });
     return token;
   }
