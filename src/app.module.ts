@@ -26,7 +26,7 @@ import { JwtAuthService } from './service/jwt.service';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.POSTGRES_URL, // Use POSTGRES_URL for connection
-      synchronize: true, // set to true for development, false for production
+      synchronize: false, // set to true for development, false for production
       autoLoadEntities: true,
       logging:true,
       ssl:true,

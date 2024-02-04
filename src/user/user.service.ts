@@ -20,6 +20,7 @@ interface userReturnType {
   id?: string;
   jwt?: string;
   message?: string;
+  status?:number
 }
 
 @Injectable()
@@ -147,7 +148,8 @@ export class UserService {
     }
   }
 
-  async sendUpdatePasswordLink(email: string): Promise<userReturnType> {
+  async sendTokenLink(email: string,linkType:string): Promise<userReturnType> {
+    console.log("called")
     try {
       const user = await this.userRepository.findOne({ where: { email } });
       if (!user) {
@@ -164,10 +166,11 @@ export class UserService {
         updateToken.username,
         `${this.configService.get<string>(
           'ORIGIN',
-        )}/user/update-password?token=${token}`,
+        )}${linkType==='resend'?`/auth/verify/${token}`:`/auth/update-password/${token}`}`,
       );
       return {
-        message: `update password linked sended to ${updateToken.email}`,
+        status:200,
+        message: linkType==='resend'?`verification link sent to ${updateToken.email}`:`update password linked sended to ${updateToken.email}`,
       };
     } catch (err) {
       console.log(err);

@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Query,
-  Put
-} from '@nestjs/common';
+import { Controller, Post, Body, Query, Put } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserCreateDTO } from './dto/user-create.dto';
 import { EmailValidationPipe } from 'src/pipe/email-validation/email-validation.pipe';
@@ -12,9 +6,7 @@ import { UserUpdateDTO } from './dto/user-update.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly userService: UserService
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post('/create')
   create(@Body() createUserDto: UserCreateDTO): any {
@@ -26,23 +18,32 @@ export class UserController {
     return this.userService.verifyEmail(token);
   }
 
-  @Put('/forget-password')
-  sendUpdatePasswordLink(@Query('email',new EmailValidationPipe()) email: string): any {
-    return this.userService.sendUpdatePasswordLink(email);
+  @Put('/send-link')
+  sendUpdatePasswordLink(
+    @Query('email', new EmailValidationPipe()) email: string,
+    @Query('linkType') linkType: string,
+  ): any {
+    return this.userService.sendTokenLink(email,linkType);
   }
 
   @Put('/update-password')
-  updatePassword(@Body() updateUserDto:UserUpdateDTO,@Query('token') token:string): any {
-    return this.userService.updatePassword(updateUserDto.password,token);
+  updatePassword(
+    @Body() updateUserDto: UserUpdateDTO,
+    @Query('token') token: string,
+  ): any {
+    return this.userService.updatePassword(updateUserDto.password, token);
   }
 
   @Post('/login')
-  login(@Body('email',new EmailValidationPipe()) email:string,@Body('password') password:string):any{
-    return this.userService.login(email,password);
+  login(
+    @Body('email', new EmailValidationPipe()) email: string,
+    @Body('password') password: string,
+  ): any {
+    return this.userService.login(email, password);
   }
 
   @Put('/update')
-  update(@Body() updateUserDto:UserUpdateDTO):any{
-    return
+  update(@Body() updateUserDto: UserUpdateDTO): any {
+    return;
   }
 }
