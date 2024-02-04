@@ -56,7 +56,7 @@ export class UserService {
           user.username,
           `${this.configService.get<string>(
             'ORIGIN',
-          )}/user/verify?token=${token}`,
+          )}/auth/verify?token=${token}`,
         );
         return { message: `Verification link sent to ${user.email}` };
       } else {
@@ -149,7 +149,6 @@ export class UserService {
   }
 
   async sendTokenLink(email: string,linkType:string): Promise<userReturnType> {
-    console.log("called")
     try {
       const user = await this.userRepository.findOne({ where: { email } });
       if (!user) {
@@ -161,15 +160,24 @@ export class UserService {
       );
       user.token = token;
       const updateToken = await this.userRepository.save(user);
-      const sendMail = await this.emailService.sendUpdatePasswordLink(
-        updateToken.email,
-        updateToken.username,
-        `${this.configService.get<string>(
-          'ORIGIN',
-        )}${linkType==='resend'?`/auth/verify/${token}`:`/auth/update-password/${token}`}`,
-      );
+      if(linkType==="resend"){
+        await this.emailService.sendVerificationLink(
+          updateToken.email,
+          updateToken.username,
+          `${this.configService.get<string>(
+            'ORIGIN',
+          )}/auth/verify?token=${token}`,
+        );
+      }else{
+        await this.emailService.sendUpdatePasswordLink(
+          updateToken.email,
+          updateToken.username,
+          `${this.configService.get<string>(
+            'ORIGIN',
+          )}/auth/update-password?token=${token}`,
+        );
+      }
       return {
-        status:200,
         message: linkType==='resend'?`verification link sent to ${updateToken.email}`:`update password linked sended to ${updateToken.email}`,
       };
     } catch (err) {
@@ -195,11 +203,9 @@ export class UserService {
         throw new NotFoundException('User not found');
       }
 
-      // Update the user's email verification status
-      user.verified = true;
       user.token = null; // Optional: Clear the verification token
-      (user.password = await this.passwordService.hashPassword(password)),
-        (user.updatedAt = `${new Date().getTime()}`);
+      user.password = await this.passwordService.hashPassword(password)
+      user.updatedAt = `${new Date().getTime()}`
       await this.userRepository.save(user);
 
       return { message: 'Password successfully updated' };
@@ -219,6 +225,9 @@ export class UserService {
       const user = await this.userRepository.findOne({ where: { email } });
       if (!user) {
         throw new NotFoundException('User not fount');
+      }
+      if(!user.verified){
+        throw new NotFoundException("email not verified")
       }
       const compare = await this.passwordService.comparePassword(
         password,
