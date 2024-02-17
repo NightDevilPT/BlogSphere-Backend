@@ -19,5 +19,21 @@ export class UpdateProfileDTO {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  avatar?: string;
+  image?: string;
+
+  @IsString()
+  @IsOptional()
+  facebook?: string;
+
+  @IsString()
+  @IsOptional()
+  twitter?: string;
+
+  @IsString()
+  @IsOptional()
+  instagram?: string;
+
+  @IsString()
+  @IsOptional()
+  youtube?: string;
 }

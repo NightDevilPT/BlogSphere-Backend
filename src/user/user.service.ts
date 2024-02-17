@@ -20,7 +20,7 @@ interface userReturnType {
   id?: string;
   jwt?: string;
   message?: string;
-  status?:number
+  status?: number;
 }
 
 @Injectable()
@@ -64,18 +64,22 @@ export class UserService {
           where: { email: createUserDto.email },
         });
         if (findUser) {
-          const token = await this.jwtService.sign({id:findUser.id});
-          return { id: findUser.id, jwt:token, message: 'Done' };
+          const token = await this.jwtService.sign({ id: findUser.id });
+          return {
+            id: findUser.id,
+            jwt: token,
+            message: 'successfully logined',
+          };
         } else {
           const userData = {
             ...createUserDto,
-            verified:true
+            verified: true,
           };
           const user = this.userRepository.create(userData);
           const saved = await this.userRepository.save(user);
 
           if (saved) {
-            const jwt = await this.jwtService.sign({id:findUser.id});
+            const jwt = await this.jwtService.sign({ id: findUser.id });
             return { id: findUser.id, jwt, message: 'Done' };
           }
         }
@@ -148,7 +152,10 @@ export class UserService {
     }
   }
 
-  async sendTokenLink(email: string,linkType:string): Promise<userReturnType> {
+  async sendTokenLink(
+    email: string,
+    linkType: string,
+  ): Promise<userReturnType> {
     try {
       const user = await this.userRepository.findOne({ where: { email } });
       if (!user) {
@@ -160,7 +167,7 @@ export class UserService {
       );
       user.token = token;
       const updateToken = await this.userRepository.save(user);
-      if(linkType==="resend"){
+      if (linkType === 'resend') {
         await this.emailService.sendVerificationLink(
           updateToken.email,
           updateToken.username,
@@ -168,7 +175,7 @@ export class UserService {
             'ORIGIN',
           )}/auth/verify?token=${token}`,
         );
-      }else{
+      } else {
         await this.emailService.sendUpdatePasswordLink(
           updateToken.email,
           updateToken.username,
@@ -178,7 +185,10 @@ export class UserService {
         );
       }
       return {
-        message: linkType==='resend'?`verification link sent to ${updateToken.email}`:`update password linked sended to ${updateToken.email}`,
+        message:
+          linkType === 'resend'
+            ? `verification link sent to ${updateToken.email}`
+            : `update password linked sended to ${updateToken.email}`,
       };
     } catch (err) {
       console.log(err);
@@ -204,8 +214,8 @@ export class UserService {
       }
 
       user.token = null; // Optional: Clear the verification token
-      user.password = await this.passwordService.hashPassword(password)
-      user.updatedAt = `${new Date().getTime()}`
+      user.password = await this.passwordService.hashPassword(password);
+      user.updatedAt = `${new Date().getTime()}`;
       await this.userRepository.save(user);
 
       return { message: 'Password successfully updated' };
@@ -226,8 +236,8 @@ export class UserService {
       if (!user) {
         throw new NotFoundException('User not fount');
       }
-      if(!user.verified){
-        throw new NotFoundException("email not verified")
+      if (!user.verified) {
+        throw new NotFoundException('email not verified');
       }
       const compare = await this.passwordService.comparePassword(
         password,

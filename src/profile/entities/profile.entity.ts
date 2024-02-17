@@ -19,8 +19,20 @@ export class ProfileEntity {
   @Column({ type: 'enum', enum: ['male', 'female', 'other'], nullable: true })
   gender: string;
 
-  @Column({ type: 'varchar', length: 255, default: '' })
-  avatar: string;
+  @Column({ type: 'varchar', length: 255, default: null })
+  image: string;
+
+  @Column({ type: 'varchar', length: 255, default: null })
+  facebook: string;
+
+  @Column({ type: 'varchar', length: 255, default: null })
+  twitter: string;
+
+  @Column({ type: 'varchar', length: 255, default: null })
+  instagram: string;
+
+  @Column({ type: 'varchar', length: 255, default: null })
+  youtube: string;
 
   @OneToOne(() => UserEntity, user => user.profile, { cascade: ['insert', 'update'], eager: true })
   @JoinColumn()

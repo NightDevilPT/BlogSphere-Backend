@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Req, BadRequestException, ValidationPipe, UsePipes, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseInterceptors,
+  Req,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { GlobalInterceptor } from 'src/interceptors/guard.interceptor';
 import { ProfileCreateDTO } from './dto/profile-create.dto';
@@ -9,21 +19,22 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Get(':id')
+  @UseInterceptors(GlobalInterceptor)
   findOne(@Param('id') id: string) {
     return this.profileService.getProfileByIdWithUser(id);
   }
 
   @Get()
-  findAll() {
-    return this.profileService.findAll();
+  findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return this.profileService.findAll(page,limit);
   }
 
   @Post('create')
   @UseInterceptors(GlobalInterceptor)
-  create(@Body() createProfileDto: ProfileCreateDTO,@Req() req: Request) {
-    return this.profileService.create(createProfileDto,req.body?.user?.id);
+  create(@Body() createProfileDto: ProfileCreateDTO, @Req() req: Request) {
+    console.log(req.body);
+    return this.profileService.create(createProfileDto, req.body?.user?.id);
   }
-
 
   @Put(':id')
   @UseInterceptors(GlobalInterceptor)

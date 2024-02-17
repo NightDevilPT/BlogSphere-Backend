@@ -7,7 +7,7 @@ import { JwtAuthService } from 'src/service/jwt.service';
 export class GlobalInterceptor implements NestInterceptor {
   constructor(private readonly jwtService: JwtAuthService) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  async intercept(context: ExecutionContext, next: CallHandler):Promise<any> {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request.headers.authorization);
 
@@ -16,7 +16,7 @@ export class GlobalInterceptor implements NestInterceptor {
     }
 
     try {
-      const decoded = this.jwtService.verify(token);
+      const decoded = await this.jwtService.verify(token);
       if (!decoded) {
         return throwError(() => new UnauthorizedException('Invalid Token'));
       }

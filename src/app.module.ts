@@ -18,32 +18,39 @@ import { PasswordService } from './service/password-service.service';
 import { GlobalInterceptor } from './interceptors/guard.interceptor';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthService } from './service/jwt.service';
-
+import { PaginationService } from './service/pagination.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host:process.env.POSTGRES_HOST,
-      port:parseInt(process.env.POSTGRES_PORT),
-      username:process.env.POSTGRES_USER,
-      password:process.env.POSTGRES_PASSWORD,
-      database:process.env.POSTGRES_DATABASE,
+      host: process.env.POSTGRES_HOST,
+      port: parseInt(process.env.POSTGRES_PORT),
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DATABASE,
       synchronize: true,
       ssl: { rejectUnauthorized: false },
-      entities:[UserEntity,ProfileEntity,BlogEntity,CommentEntity]
+      entities: [UserEntity, ProfileEntity, BlogEntity, CommentEntity],
     }),
     UserModule,
     ProfileModule,
     BlogModule,
     CommentModule,
     JwtModule.register({
-      secret:process.env.JWT_SECRET,
-      signOptions:{expiresIn:process.env.JWT_EXPIREIN}
-    })
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: process.env.JWT_EXPIREIN },
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService,PasswordService,GlobalInterceptor,JwtAuthService],
+  providers: [
+    AppService,
+    EmailService,
+    PasswordService,
+    GlobalInterceptor,
+    JwtAuthService,
+    PaginationService,
+  ],
 })
 export class AppModule {}

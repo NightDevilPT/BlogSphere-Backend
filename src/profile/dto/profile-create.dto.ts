@@ -1,5 +1,5 @@
 // src/profile/dto/profile-create.dto.ts
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 
 export class ProfileCreateDTO {
@@ -17,9 +17,29 @@ export class ProfileCreateDTO {
 
   @IsNotEmpty()
   @IsString()
-  avatar: string;
-
+  image: string;
+  
+  @IsDate()
+  @IsOptional()
   createdAt?: string;
 
+  @IsDate()
+  @IsOptional()
   updatedAt?: string;
+
+  @IsString()
+  @IsOptional()
+  facebook?: string;
+
+  @IsString()
+  @IsOptional()
+  twitter?: string;
+
+  @IsString()
+  @IsOptional()
+  instagram?: string;
+
+  @IsString()
+  @IsOptional()
+  youtube?: string;
 }

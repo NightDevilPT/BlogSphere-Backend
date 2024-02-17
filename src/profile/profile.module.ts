@@ -7,10 +7,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfileEntity } from './entities/profile.entity';
 import { JwtAuthService } from 'src/service/jwt.service';
 import { JwtService } from '@nestjs/jwt';
+import { PaginationService } from 'src/service/pagination.service';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([ProfileEntity]),ConfigModule.forRoot()],
+  imports: [TypeOrmModule.forFeature([ProfileEntity]), ConfigModule.forRoot()],
   controllers: [ProfileController],
-  providers: [ProfileService,GlobalInterceptor,JwtAuthService,JwtService],
+  providers: [
+    ProfileService,
+    GlobalInterceptor,
+    JwtAuthService,
+    JwtService,
+    PaginationService,
+  ],
 })
 export class ProfileModule {}
