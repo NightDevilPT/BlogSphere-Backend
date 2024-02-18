@@ -26,13 +26,12 @@ export class ProfileController {
 
   @Get()
   findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
-    return this.profileService.findAll(page,limit);
+    return this.profileService.findAll(page, limit);
   }
 
   @Post('create')
   @UseInterceptors(GlobalInterceptor)
-  create(@Body() createProfileDto: ProfileCreateDTO, @Req() req: Request) {
-    console.log(req.body);
+  create(@Body() createProfileDto: ProfileCreateDTO, @Req() req: Request): any {
     return this.profileService.create(createProfileDto, req.body?.user?.id);
   }
 

@@ -3,7 +3,14 @@
 import { BlogEntity } from 'src/blog/entities/blog.entity';
 import { CommentEntity } from 'src/comment/entities/comment.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity('profiles')
 export class ProfileEntity {
@@ -20,6 +27,9 @@ export class ProfileEntity {
   gender: string;
 
   @Column({ type: 'varchar', length: 255, default: null })
+  bio: string;
+
+  @Column({ type: 'varchar', length: 255, default: null })
   image: string;
 
   @Column({ type: 'varchar', length: 255, default: null })
@@ -34,13 +44,18 @@ export class ProfileEntity {
   @Column({ type: 'varchar', length: 255, default: null })
   youtube: string;
 
-  @OneToOne(() => UserEntity, user => user.profile, { cascade: ['insert', 'update'], eager: true })
+  @OneToOne(() => UserEntity, (user) => user.profile, {
+    cascade: ['insert', 'update'],
+    eager: true,
+  })
   @JoinColumn()
   user: UserEntity;
 
-  @OneToMany(() => BlogEntity, blog => blog.profile, { cascade: true })
+  @OneToMany(() => BlogEntity, (blog) => blog.profile, { cascade: true })
   blogs: BlogEntity[];
 
-  @OneToMany(() => CommentEntity, comment => comment.profile, { cascade: true })
+  @OneToMany(() => CommentEntity, (comment) => comment.profile, {
+    cascade: true,
+  })
   comments: CommentEntity[];
 }

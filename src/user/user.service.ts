@@ -15,6 +15,7 @@ import { ConfigService } from '@nestjs/config';
 
 import * as jwt from 'jsonwebtoken';
 import { JwtAuthService } from 'src/service/jwt.service';
+import { ProfileEntity } from 'src/profile/entities/profile.entity';
 
 interface userReturnType {
   id?: string;
@@ -28,6 +29,8 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(ProfileEntity)
+    private readonly profileRepository: Repository<ProfileEntity>,
     private readonly passwordService: PasswordService,
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
@@ -97,6 +100,24 @@ export class UserService {
         err.message || 'Internal server error occurred',
       );
     }
+  }
+
+  async getUserData(id: any): Promise<UserEntity> {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    const findProfile = await this.filterProfileData(id)
+    return {
+      id: findUser.id,
+      username: findUser.username,
+      email: findUser.email,
+      createdAt: findUser.createdAt,
+      updatedAt: findUser.updatedAt,
+      verified: findUser.verified,
+      profile: findProfile,
+    } as UserEntity;
   }
 
   // user.service.ts
@@ -254,5 +275,13 @@ export class UserService {
         throw new NotFoundException(err.message);
       }
     }
+  }
+
+  async filterProfileData(id:string){
+    return await this.profileRepository
+    .createQueryBuilder('profile')
+    .leftJoin('profile.user', 'user') // Use leftJoin instead of leftJoinAndSelect
+    .where('user.id = :userId', { userId: id })
+    .getOne();
   }
 }

@@ -1,12 +1,19 @@
-import { Controller, Post, Body, Query, Put } from '@nestjs/common';
+import { Controller, Post, Body, Query, Put, Get, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserCreateDTO } from './dto/user-create.dto';
 import { EmailValidationPipe } from 'src/pipe/email-validation/email-validation.pipe';
 import { UserUpdateDTO } from './dto/user-update.dto';
+import { GlobalInterceptor } from 'src/interceptors/guard.interceptor';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('/get-user')
+  @UseInterceptors(GlobalInterceptor)
+  findOne(@Body() user:any) {
+    return this.userService.getUserData(user.user.id);
+  }
 
   @Post('/create')
   create(@Body() createUserDto: UserCreateDTO): any {

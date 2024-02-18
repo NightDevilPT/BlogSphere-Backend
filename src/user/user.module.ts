@@ -9,10 +9,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailValidationPipe } from 'src/pipe/email-validation/email-validation.pipe';
 import { JwtAuthService } from 'src/service/jwt.service';
 import { JwtService } from '@nestjs/jwt';
+import { GlobalInterceptor } from 'src/interceptors/guard.interceptor';
+import { ProfileEntity } from 'src/profile/entities/profile.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([UserEntity]),ConfigModule.forRoot()],
+  imports:[TypeOrmModule.forFeature([UserEntity,ProfileEntity]),ConfigModule.forRoot()],
   controllers: [UserController],
-  providers: [UserService,PasswordService,EmailService,EmailValidationPipe,JwtAuthService,JwtService,ConfigService],
+  providers: [UserService,PasswordService,EmailService,EmailValidationPipe,JwtAuthService,JwtService,ConfigService,GlobalInterceptor],
 })
 export class UserModule {}

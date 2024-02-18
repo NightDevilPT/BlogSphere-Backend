@@ -10,18 +10,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { PaginationService } from 'src/service/pagination.service';
 
+interface profileReturnType {
+  message?: string;
+  status?: number;
+  data: ProfileEntity;
+}
+
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(ProfileEntity)
     private readonly profileRepository: Repository<ProfileEntity>,
-    private paginationService: PaginationService
-  ) { }
+    private paginationService: PaginationService,
+  ) {}
 
   async create(
     createProfileDto: ProfileCreateDTO,
     id: string,
-  ): Promise<ProfileCreateDTO> {
+  ): Promise<profileReturnType> {
     try {
       const newProfileData = {
         ...createProfileDto,
@@ -29,19 +35,23 @@ export class ProfileService {
       };
       const newProfile = await this.profileRepository.create(newProfileData);
       const createdProfile = await this.profileRepository.save(newProfile);
-      return createdProfile;
+      return {
+        message: 'Profile Successfully created',
+        status: 200,
+        data: createdProfile,
+      };
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async findAll(page:number,limit:number) {
-    try{
-      const allUsers = await this.profileRepository.find()
-      const modifiedArray = this.modifyProfile(allUsers)
-      return this.paginationService.paginateData(modifiedArray,page,limit);
-    }catch(error){
-      throw new BadRequestException(error.message)
+  async findAll(page: number, limit: number) {
+    try {
+      const allUsers = await this.profileRepository.find();
+      const modifiedArray = this.modifyProfile(allUsers);
+      return this.paginationService.paginateData(modifiedArray, page, limit);
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -49,12 +59,14 @@ export class ProfileService {
     profileId: string,
   ): Promise<ProfileEntity | any> {
     try {
-      const profileData = await this.profileRepository.findOne({where: {id: profileId}});
+      const profileData = await this.profileRepository.findOne({
+        where: { id: profileId },
+      });
       this.modifyProfile(profileData);
-      if(profileData.user){
+      if (profileData.user) {
         this.modifyProfile(profileData);
       }
-      return profileData
+      return profileData;
     } catch (error) {
       if (error.name === 'EntityNotFound') {
         throw new NotFoundException('Profile not found');
@@ -64,24 +76,35 @@ export class ProfileService {
   }
 
   async update(id: string, updateProfileDto: any) {
-    try{
-      console.log(id)
-      const findAndUpdate = await this.profileRepository.update(id,updateProfileDto)
-      if(findAndUpdate){
-        return {message:'profile successfully updated',success:true,error:false}
+    try {
+      console.log(id);
+      const findAndUpdate = await this.profileRepository.update(
+        id,
+        updateProfileDto,
+      );
+      if (findAndUpdate) {
+        return {
+          message: 'profile successfully updated',
+          success: true,
+          error: false,
+        };
       }
 
-      throw new NotFoundException('profile not found')
-    }catch(error){
-      throw new BadRequestException(error.message)
+      throw new NotFoundException('profile not found');
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
   }
 
-  modifyProfile(profileData:ProfileEntity | ProfileEntity[]){
+  modifyProfile(profileData: ProfileEntity | ProfileEntity[]) {
     // if(profileData)
-    if (Array.isArray(profileData) && profileData.length > 0 && typeof profileData[0] === 'object') {
-      profileData.map((profiles:ProfileEntity)=>{
-        if(profiles.user){
+    if (
+      Array.isArray(profileData) &&
+      profileData.length > 0 &&
+      typeof profileData[0] === 'object'
+    ) {
+      profileData.map((profiles: ProfileEntity) => {
+        if (profiles.user) {
           profiles.user = {
             id: profiles.user.id,
             username: profiles.user.username,
@@ -91,8 +114,12 @@ export class ProfileService {
             verified: profiles.user.verified,
           } as UserEntity;
         }
-      })
-    } else if (typeof profileData === 'object' && profileData !== null && !Array.isArray(profileData)) {
+      });
+    } else if (
+      typeof profileData === 'object' &&
+      profileData !== null &&
+      !Array.isArray(profileData)
+    ) {
       profileData.user = {
         id: profileData.user.id,
         username: profileData.user.username,
@@ -102,6 +129,6 @@ export class ProfileService {
         verified: profileData.user.verified,
       } as UserEntity;
     }
-    return profileData
+    return profileData;
   }
 }
