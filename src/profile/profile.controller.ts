@@ -39,7 +39,11 @@ export class ProfileController {
 
   @Put(':id')
   @UseInterceptors(GlobalInterceptor)
-  update(@Param('id') id: string, @Body() updateProfileDto: any) {
-    return this.profileService.update(id, updateProfileDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateProfileDto: any,
+    @Req() req: Request & { user?: any },
+  ) {
+    return this.profileService.update(id, updateProfileDto, req.user.id);
   }
 }
