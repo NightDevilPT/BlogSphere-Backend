@@ -47,7 +47,9 @@ export class ProfileService {
 
   async findAll(page: number, limit: number) {
     try {
-      const allUsers = await this.profileRepository.find();
+      const allUsers = await this.profileRepository.find({
+        relations: ['user', 'blogs'],
+      });
       const modifiedArray = this.modifyProfile(allUsers);
       return this.paginationService.paginateData(modifiedArray, page, limit);
     } catch (error) {
@@ -61,6 +63,7 @@ export class ProfileService {
     try {
       const profileData = await this.profileRepository.findOne({
         where: { id: profileId },
+        relations: ['user', 'blogs'],
       });
       this.modifyProfile(profileData);
       if (profileData.user) {
@@ -77,7 +80,6 @@ export class ProfileService {
 
   async update(id: string, updateProfileDto: any) {
     try {
-      console.log(id);
       const findAndUpdate = await this.profileRepository.update(
         id,
         updateProfileDto,
@@ -97,7 +99,6 @@ export class ProfileService {
   }
 
   modifyProfile(profileData: ProfileEntity | ProfileEntity[]) {
-    // if(profileData)
     if (
       Array.isArray(profileData) &&
       profileData.length > 0 &&

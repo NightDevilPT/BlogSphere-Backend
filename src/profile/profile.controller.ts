@@ -19,7 +19,6 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Get(':id')
-  @UseInterceptors(GlobalInterceptor)
   findOne(@Param('id') id: string) {
     return this.profileService.getProfileByIdWithUser(id);
   }
@@ -31,8 +30,11 @@ export class ProfileController {
 
   @Post('create')
   @UseInterceptors(GlobalInterceptor)
-  create(@Body() createProfileDto: ProfileCreateDTO, @Req() req: Request): any {
-    return this.profileService.create(createProfileDto, req.body?.user?.id);
+  create(
+    @Body() createProfileDto: ProfileCreateDTO,
+    @Req() req: Request & { user?: any },
+  ): any {
+    return this.profileService.create(createProfileDto, req.user?.id);
   }
 
   @Put(':id')

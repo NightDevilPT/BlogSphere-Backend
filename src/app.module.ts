@@ -19,6 +19,7 @@ import { GlobalInterceptor } from './interceptors/guard.interceptor';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthService } from './service/jwt.service';
 import { PaginationService } from './service/pagination.service';
+import { AllEntities } from './module-index';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { PaginationService } from './service/pagination.service';
       database: process.env.POSTGRES_DATABASE,
       synchronize: true,
       ssl: { rejectUnauthorized: false },
-      entities: [UserEntity, ProfileEntity, BlogEntity, CommentEntity],
+      entities: [...AllEntities],
     }),
     UserModule,
     ProfileModule,

@@ -21,7 +21,7 @@ export class GlobalInterceptor implements NestInterceptor {
         return throwError(() => new UnauthorizedException('Invalid Token'));
       }
 
-      request.body.user = decoded;
+      request.user = decoded;
 
       return next.handle().pipe(
         catchError((err) => {
