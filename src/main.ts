@@ -14,8 +14,8 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true, // enable credentials (cookies, Authorization headers, etc.)
   });
-  await app.init();
   await app.listen(3001);
+  await app.init();
 }
 bootstrap();
 
