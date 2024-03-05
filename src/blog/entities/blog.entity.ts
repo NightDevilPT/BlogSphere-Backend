@@ -19,6 +19,9 @@ export class BlogEntity {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  image: string;
+
   @Column({ type: 'varchar', length: 255, array: true })
   tags: string[];
 
