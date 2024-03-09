@@ -44,6 +44,12 @@ export class ProfileEntity {
   @Column({ type: 'varchar', length: 255, default: null })
   youtube: string;
 
+  @Column({ default: new Date().getTime() })
+  createdAt: string;
+
+  @Column({ default: new Date().getTime() })
+  updatedAt: string;
+
   @OneToOne(() => UserEntity, (user) => user.profile, {
     cascade: ['insert', 'update'],
     eager: true,

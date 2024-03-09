@@ -22,7 +22,7 @@ export class BlogEntity {
   @Column({ type: 'varchar', length: 255 })
   image: string;
 
-  @Column({ type: 'varchar', length: 255, array: true })
+  @Column({ type: 'varchar', array: true, nullable: true })
   tags: string[];
 
   @Column({ type: 'text', nullable: true })
@@ -30,6 +30,12 @@ export class BlogEntity {
 
   @Column({ type: 'text', nullable: true })
   description: string;
+
+  @Column({ default: new Date().getTime() })
+  createdAt: string;
+
+  @Column({ default: new Date().getTime() })
+  updatedAt: string;
 
   @ManyToOne(() => ProfileEntity, (profile) => profile.blogs)
   @JoinColumn()

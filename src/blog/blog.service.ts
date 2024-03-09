@@ -6,6 +6,13 @@ import { Repository } from 'typeorm';
 import { BlogEntity } from './entities/blog.entity';
 import { PaginationService } from 'src/service/pagination.service';
 
+interface filterType {
+  title?:string;
+  tags?:string[];
+  profileName?:string;
+  sortBy?:string;
+}
+
 @Injectable()
 export class BlogService {
   constructor(
@@ -37,14 +44,53 @@ export class BlogService {
     };
   }
 
-  async findAll(page: number, limit: number) {
-    const findBlog = await this.blogEntity.find({
-      relations: ['profile'],
+  async findAll(page: number, limit: number, filter: filterType) {
+    const {tags,title,profileName,sortBy} = filter;
+    let queryBuilder = this.blogEntity
+      .createQueryBuilder('blog')
+      .leftJoinAndSelect('blog.profile', 'profile')
+      .leftJoinAndSelect('profile.user', 'user');
+
+    if (title && title.length > 0) {
+      queryBuilder = queryBuilder.andWhere(`blog.title LIKE :title`, {
+        title: `%${title}%`,
+      });
+    }
+
+    if (tags && tags.length > 0) {
+      const tagsArray = Array.isArray(tags) ? tags : [tags];
+      queryBuilder = queryBuilder.andWhere(`blog.tags && :tags`, {
+        tags: tagsArray,
+      });
+    }
+
+    if (profileName && profileName.length > 0) {
+      queryBuilder = queryBuilder.andWhere(`profile.firstname LIKE :profileName`, {
+        profileName: `%${profileName}%`,
+      });
+    }
+
+    if (sortBy && sortBy.length > 0) {
+      switch (sortBy) {
+        case 'date':
+          queryBuilder = queryBuilder.orderBy('blog.createdAt', 'DESC');
+          break;
+        case 'title':
+          queryBuilder = queryBuilder.orderBy('blog.title', 'ASC');
+          break;
+        default:
+          queryBuilder = queryBuilder.orderBy('blog.title', 'ASC');
+          break;
+      }
+    }
+
+    const allBlogs = await queryBuilder.getMany();
+
+    const modifiedBlogs = allBlogs.map((blog: BlogEntity) => {
+      return { ...blog, profile: this.modifyProfile(blog.profile) };
     });
-    const allBlogs = findBlog?.map((items: BlogEntity) => {
-      return { ...items, profile: this.modifyProfile(items.profile) };
-    });
-    return this.paginationService.paginateData(allBlogs, page, limit);
+
+    return this.paginationService.paginateData(modifiedBlogs, page, limit);
   }
 
   async findOne(id: string) {

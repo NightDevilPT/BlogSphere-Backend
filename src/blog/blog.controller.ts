@@ -9,6 +9,7 @@ import {
   Req,
   Put,
   Query,
+  NotAcceptableException,
 } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { GlobalInterceptor } from 'src/interceptors/guard.interceptor';
@@ -27,8 +28,18 @@ export class BlogController {
   }
 
   @Get()
-  findAll(@Query('page') page:number = 1,@Query('limit') limit:number = 10 ) {
-    return this.blogService.findAll(page,limit);
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('filter') filter: string = '',
+  ): Promise<any> {
+    let filterObject = {};
+    try {
+      filterObject = JSON.parse(filter);
+    } catch (error) {
+      return new NotAcceptableException('Filter is not Proper');
+    }
+    return this.blogService.findAll(page, limit, filterObject);
   }
 
   @Get(':id')
